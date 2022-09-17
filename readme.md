@@ -23,3 +23,4 @@ $ ./amm help -model <model-name>
 ## List of models
 
 - Continuous run & tumble (`-model run-and-tumble`)
+- Active Brownian motion (`-model active-brownian`)

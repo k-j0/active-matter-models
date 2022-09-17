@@ -98,7 +98,7 @@ float RunAndTumble<D>::getMSD () {
 template<int D>
 void RunAndTumble<D>::print () {
     std::size_t size = particles.size();
-    std::printf("Run and tumble, %ld particles:\n", size);
+    std::printf("Run and Tumble, %ld particles:\n", size);
     for (std::size_t i = 0, sz = size > 10 ? 10 : size; i < sz; ++i) {
         std::printf("\t- (%ld) %s, %s\n", i, particles[i].pos.toString().c_str(), particles[i].dir.toString().c_str());
     }

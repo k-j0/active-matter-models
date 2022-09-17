@@ -4,6 +4,7 @@
 #include "Arguments.h"
 #include "Model.h"
 #include "RunAndTumble.h"
+#include "ActiveBrownianMotion.h"
 
 class ModelFactory {
     ModelFactory()=delete;
@@ -20,6 +21,10 @@ public:
         
         if (name.compare("run-and-tumble") == 0) {
             return new RunAndTumble<D>(particleCount, args.read<float>("flip-prob", 0.1f), seed);
+        }
+        
+        if (name.compare("active-brownian") == 0) {
+            return new ActiveBrownianMotion<D>(particleCount, args.read<float>("angular-diffusion", 0.1f), seed);
         }
         
         std::printf("Invalid model name %s!\n", name.c_str());

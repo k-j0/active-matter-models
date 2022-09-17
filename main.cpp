@@ -9,7 +9,14 @@ int main (int argc, char** argv) {
     std::size_t iterations;
     {
         Arguments args(argc, argv);
-        model = ModelFactory::build(args);
+        unsigned int d = args.read<int>("dim", 2);
+        switch (d) {
+            case 2: model = ModelFactory::build<2>(args); break;
+            case 3: model = ModelFactory::build<3>(args); break;
+            default:
+                std::printf("Invalid dimension %d, only 2D and 3D are supported.\n", d);
+                exit(1);
+        }
         iterations = args.read<int>("iter", 1000);
     }
     

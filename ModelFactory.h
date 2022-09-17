@@ -11,6 +11,7 @@ class ModelFactory {
     ModelFactory(ModelFactory&&)=delete;
 public:
     
+    template<int D>
     static Model* build(Arguments& args) {
         
         std::string name = args.read<std::string>("model");
@@ -18,7 +19,7 @@ public:
         unsigned int seed = args.read<int>("seed", 0);
         
         if (name.compare("run-and-tumble") == 0) {
-            return new RunAndTumble(particleCount, args.read<float>("flip-prob", 0.1f), seed);
+            return new RunAndTumble<D>(particleCount, args.read<float>("flip-prob", 0.1f), seed);
         }
         
         std::printf("Invalid model name %s!\n", name.c_str());

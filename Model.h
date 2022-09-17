@@ -3,8 +3,11 @@
 #include <random>
 #include <functional>
 #include <thread>
+#include "Vec.h"
+#include "VecUtils.h"
 
-class Model {
+// Base, non-templated class exposing the APIs available to operate on the various models
+class ModelBase {
     
     unsigned int seed;
     
@@ -22,11 +25,86 @@ protected:
     }
     
 public:
-    Model (unsigned int seed) : seed(seed) { }
+    ModelBase (unsigned int seed) : seed(seed) { }
     
-    virtual ~Model () { }
+    virtual ~ModelBase () { }
     virtual void update() = 0;
     virtual float getMSD() = 0;
     virtual void print() = 0;
     
 };
+
+
+template<int D>
+struct Particle {
+    Vec<D> pos;
+    Vec<D-1> rotation; // in 2D, theta; in 3D theta (lat) and phi (long)
+};
+
+// Templated base class from which the common models can derive, containing the particle data
+template<int D>
+class Model : public ModelBase {
+    
+protected:
+    std::size_t particleCount;
+    std::vector<Particle<D>> particles;
+    
+    Vec<D-1> randomRotation ();
+    
+    virtual std::string getName () = 0;
+    
+public:
+    
+    Model (std::size_t particleCount, unsigned int seed) : ModelBase(seed), particleCount(particleCount) {
+        particles.reserve(particleCount);
+        for (std::size_t i = 0; i < particleCount; ++i) {
+            particles.push_back({
+                Vec<D>::Zero(),
+                randomRotation()
+            });
+        }
+    }
+    
+    virtual ~Model () { }
+    
+    virtual float getMSD () override;
+    virtual void print() override;
+    
+};
+
+
+template<>
+Vec<1> Model<2>::randomRotation () {
+    return { rand01() * PI * 2.0f };
+}
+
+template<>
+Vec<2> Model<3>::randomRotation () {
+    return {
+        rand01() * PI * 2.0f,
+        rand01() * PI
+    };
+}
+
+template<int D>
+float Model<D>::getMSD () {
+    float sum = 0.0f;
+    
+    #pragma omp parallel for reduction(+: sum)
+    for (std::size_t i = 0; i < particleCount; ++i) {
+        sum += particles[i].pos.lengthSqr();
+    }
+    
+    return sum / particleCount;
+}
+
+template<int D>
+void Model<D>::print () {
+    std::printf("%s, %ld particles:\n", getName().c_str(), particleCount);
+    for (std::size_t i = 0, sz = particleCount > 10 ? 10 : particleCount; i < sz; ++i) {
+        std::printf("\t- (%ld) %s\n", i, particles[i].pos.toString().c_str());
+    }
+    if (particleCount > 10) std::printf("\t- ... (only first 10 shown)\n");
+    std::printf("MSD: %f\n", getMSD());
+    std::printf("\n");
+}

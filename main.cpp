@@ -5,7 +5,7 @@
 int main (int argc, char** argv) {
     
     // Read console args
-    Model* model = nullptr;
+    ModelBase* model = nullptr;
     std::size_t iterations;
     {
         Arguments args(argc, argv);

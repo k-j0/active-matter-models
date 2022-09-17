@@ -14,7 +14,7 @@ class ModelFactory {
 public:
     
     template<int D>
-    static Model* build(Arguments& args) {
+    static ModelBase* build(Arguments& args) {
         
         std::string name = args.read<std::string>("model");
         std::size_t particleCount = args.read<int>("particles", 512);

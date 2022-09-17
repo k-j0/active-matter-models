@@ -1,7 +1,7 @@
 
 OUT := amm
 CC := g++
-CFLAGS := -fopenmp -O3 -Wall -Wextra -Werror -std=c++17 -m64 -DNDEBUG
+CFLAGS := -fopenmp -O3 -Wall -Wextra -Werror -fmax-errors=8 -std=c++17 -m64 -DNDEBUG
 
 SOURCES := $(wildcard *.cpp)
 OBJECTS := $(SOURCES:.cpp=.o)

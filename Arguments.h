@@ -15,7 +15,7 @@ class Arguments {
         // error out upon no existing specialization - see below for implemented specializations
         std::string name = typeName<T>();
         std::printf("No specialization of fromString<%s> in Arguments class, cannot read %s types!\n", name.c_str(), name.c_str());
-        exit(1);
+        std::exit(1);
     }
     
     template<typename T>
@@ -35,7 +35,7 @@ public:
                 // passing 'help' as an argument turns on help mode, printing each key/type and exiting early
                 if (arg.compare("help") == 0 && !hasPrevKey) {
                     help = true;
-                    printf("Usage:\n");
+                    std::printf("Usage:\n");
                     continue;
                 }
                 
@@ -51,7 +51,7 @@ public:
                     hasPrevKey = false;
                 } else {
                     std::printf("Error reading arguments: value '%s' is not bound to a key (did you mean '-%s'?)\n", arg.c_str(), arg.c_str());
-                    exit(1);
+                    std::exit(1);
                 }
                 
             }
@@ -61,10 +61,10 @@ public:
     virtual ~Arguments () {
         if (args.size() > 0) {
             std::printf("Unused arguments, are you sure you meant to include these?\n%s", toString().c_str());
-            exit(1);
+            std::exit(1);
         }
         if (help) {
-            exit(0);
+            std::exit(0);
         }
     }
     
@@ -78,12 +78,12 @@ public:
             args.erase(found);
         } else if (required && !help) {
             std::printf("No argument passed for required parameter -%s!\n", key.c_str());
-            exit(1);
+            std::exit(1);
         }
         if (help) {
-            printf("-%s: %s", key.c_str(), typeName<T>().c_str());
-            if (required) printf(" (required)");
-            printf("\n");
+            std::printf("-%s: %s", key.c_str(), typeName<T>().c_str());
+            if (required) std::printf(" (required)");
+            std::printf("\n");
         }
         return val;
     }
@@ -118,7 +118,7 @@ bool Arguments::fromString<bool>(const std::string& val) const {
         return false;
     } else {
         std::printf("Could not convert '%s' to bool; use 'true' (or '1') or 'false' (or '0')!\n", val.c_str());
-        exit(1);
+        std::exit(1);
     }
 }
 
@@ -128,10 +128,10 @@ bool Arguments::fromString<bool>(const std::string& val) const {
             return std::stot(val); \
         } catch (const std::invalid_argument& e) { \
             std::printf("Could not convert '%s' to " #T " (invalid argument): %s\n", val.c_str(), e.what()); \
-            exit(1); \
+            std::exit(1); \
         } catch (const std::out_of_range& e ) { \
             std::printf("Could not convert '%s' to " #T " (out of range): %s\n", val.c_str(), e.what()); \
-            exit(1); \
+            std::exit(1); \
         } \
     }
 FROM_STRING_STD_STO_T(int, stoi);

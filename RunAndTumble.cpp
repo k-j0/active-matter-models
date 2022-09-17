@@ -7,7 +7,7 @@ RunAndTumble::RunAndTumble (std::size_t particleCount, float flipProbability, un
 {
     particles.reserve(particleCount);
     for (std::size_t i = 0; i < particleCount; ++i) {
-        float theta = rand() * PI * 2.0f;
+        float theta = rand01() * PI * 2.0f;
         particles.push_back({
             { 0, 0 },
             { std::cos(theta), std::sin(theta) }
@@ -23,10 +23,10 @@ void RunAndTumble::update () {
     for (std::size_t i = 0; i < sz; ++i) {
         
         // tumble with probability flipProbability
-        float r = rand();
+        float r = rand01();
         if (r < flipProbability) {
             // Set direction to new value; the valocity v0 is considered to always be 1
-            float theta = rand() * PI * 2.0f;
+            float theta = rand01() * PI * 2.0f;
             particles[i].dir = { std::cos(theta), std::sin(theta) };
         }
         

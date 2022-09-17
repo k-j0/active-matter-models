@@ -1,0 +1,8 @@
+
+# Binaries
+amm
+*.o
+*.exe
+
+# VS code settings
+.vscode

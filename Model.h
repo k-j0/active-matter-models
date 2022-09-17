@@ -52,17 +52,18 @@ protected:
     std::vector<Particle<D>> particles;
     float periodicity; // negative to disable periodic domain
     
+    Vec<D> randomLocation (float size);
     Vec<D-1> randomRotation ();
     
     virtual std::string getName () = 0;
     
 public:
     
-    Model (std::size_t particleCount, float periodicity, unsigned int seed) : ModelBase(seed), particleCount(particleCount), periodicity(periodicity) {
+    Model (std::size_t particleCount, float periodicity, bool startUniformly, unsigned int seed) : ModelBase(seed), particleCount(particleCount), periodicity(periodicity) {
         particles.reserve(particleCount);
         for (std::size_t i = 0; i < particleCount; ++i) {
             particles.push_back({
-                Vec<D>::Zero(),
+                startUniformly ? randomLocation(periodicity < 0 ? 500.0f : periodicity) : Vec<D>::Zero(),
                 randomRotation()
             });
         }
@@ -78,8 +79,25 @@ public:
 
 
 template<>
+Vec<2> Model<2>::randomLocation (float size) {
+    return {
+        (rand01() * 2 - 1.0f) * size,
+        (rand01() * 2 - 1.0f) * size
+    };
+}
+
+template<>
 Vec<1> Model<2>::randomRotation () {
     return { rand01() * PI * 2.0f };
+}
+
+template<>
+Vec<3> Model<3>::randomLocation (float size) {
+    return {
+        (rand01() * 2 - 1.0f) * size,
+        (rand01() * 2 - 1.0f) * size,
+        (rand01() * 2 - 1.0f) * size
+    };
 }
 
 template<>

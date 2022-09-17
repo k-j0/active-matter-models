@@ -18,7 +18,9 @@ protected:
     }
     
 public:
-    DoubleBufferedModel (std::size_t particleCount, float periodicity, unsigned int seed) : Model<D>(particleCount, periodicity, seed) {
+    DoubleBufferedModel (std::size_t particleCount, float periodicity, bool startUniformly, unsigned int seed) :
+            Model<D>(particleCount, periodicity, startUniformly, seed) {
+        
         heldParticles = std::vector<Particle<D>>(particleCount);
         particlesFront = &this->particles;
         particlesBack = &heldParticles;

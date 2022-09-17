@@ -11,7 +11,7 @@ protected:
     std::string getName () override { return "Active Brownian Motion"; }
     
 public:
-    ActiveBrownianMotion (std::size_t particleCount, float periodicity, float angularDiffusion, unsigned int seed);
+    ActiveBrownianMotion (std::size_t particleCount, float periodicity, bool startUniformly, float angularDiffusion, unsigned int seed);
     void update () override;
     
 };
@@ -19,8 +19,8 @@ public:
 
 
 template<int D>
-ActiveBrownianMotion<D>::ActiveBrownianMotion (std::size_t particleCount, float periodicity, float angularDiffusion, unsigned int seed) :
-    Model<D>(particleCount, periodicity, seed), sqrt2Dr(std::sqrt(2.0f * angularDiffusion)) { }
+ActiveBrownianMotion<D>::ActiveBrownianMotion (std::size_t particleCount, float periodicity, bool startUniformly, float angularDiffusion, unsigned int seed) :
+    Model<D>(particleCount, periodicity, startUniformly, seed), sqrt2Dr(std::sqrt(2.0f * angularDiffusion)) { }
 
 template<int D>
 void ActiveBrownianMotion<D>::update () {

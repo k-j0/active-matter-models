@@ -35,3 +35,12 @@ void RunAndTumble::update () {
         
     }
 }
+
+void RunAndTumble::print () {
+    std::size_t sz = particles.size();
+    std::printf("Run and tumble, %ld particles:\n", sz);
+    for (std::size_t i = 0; i < sz; ++i) {
+        std::printf("\t- (%ld) %s, %s\n", i, particles[i].pos.toString().c_str(), particles[i].dir.toString().c_str());
+    }
+    std::printf("\n");
+}

@@ -15,6 +15,10 @@ Other command-line options can be viewed by running
 ```sh
 $ ./amm help
 ```
+or, to view options specific to a given model
+```sh
+$ ./amm help -model <model-name>
+```
 
 ## List of models
 

@@ -17,5 +17,6 @@ class RunAndTumble : public Model {
 public:
     RunAndTumble (std::size_t particleCount, float flipProbability, unsigned int seed);
     void update () override;
+    void print () override;
     
 };

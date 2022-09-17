@@ -5,6 +5,7 @@
 #include <thread>
 #include "Vec.h"
 #include "VecUtils.h"
+#include "BinaryIO.h"
 
 // Base, non-templated class exposing the APIs available to operate on the various models
 class ModelBase {
@@ -28,9 +29,10 @@ public:
     ModelBase (unsigned int seed) : seed(seed) { }
     
     virtual ~ModelBase () { }
-    virtual void update() = 0;
-    virtual float getMSD() = 0;
-    virtual void print() = 0;
+    virtual void update () = 0;
+    virtual float getMSD () = 0;
+    virtual void print () = 0;
+    virtual void toBinary (std::vector<std::uint8_t>& data) = 0;
     
 };
 
@@ -68,7 +70,8 @@ public:
     virtual ~Model () { }
     
     virtual float getMSD () override;
-    virtual void print() override;
+    virtual void print () override;
+    void toBinary (std::vector<std::uint8_t>& data) override;
     
 };
 
@@ -107,4 +110,28 @@ void Model<D>::print () {
     if (particleCount > 10) std::printf("\t- ... (only first 10 shown)\n");
     std::printf("MSD: %f\n", getMSD());
     std::printf("\n");
+}
+
+template<int D>
+void Model<D>::toBinary (std::vector<std::uint8_t>& data) {
+    
+    // Header
+    data.push_back('A');
+    data.push_back('M');
+    data.push_back('M');
+    
+    // Write the name of the model used, the number of particles and the dimension
+    BinIO::writeString(data, getName());
+    BinIO::writeSimple<std::int32_t>(data, particleCount);
+    BinIO::writeSimple<std::int32_t>(data, D);
+    
+    for (std::size_t i = 0; i < particleCount; ++i) {
+        // for each particle, write the position and direction vectors
+        BinIO::writeVec(data, particles[i].pos);
+        BinIO::writeVec(data, VecUtils::toCartesian<D>(particles[i].rotation));
+    }
+    
+    // Footer (not strictly required, but can help ensure the data read was valid)
+    data.push_back(0);
+    
 }

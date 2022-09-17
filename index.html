@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viewer</title>
+    <style>
+        * {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            background: rgb(8, 10, 22);
+        }
+        canvas {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        button {
+            font-family: sans-serif;
+            padding: 20px;
+            margin: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        
+        // how many units across to consider the canvas
+        const SCALE = 500;
+        
+        // Helper class to load binary data
+        class BinaryImporter {
+            data;
+            #idx = 0;
+            #floatView = new DataView(new ArrayBuffer(4));
+            constructor (data) { this.data = data; }
+            
+            #byte () {
+                if (this.#idx >= this.data.length) throw `Out of bounds, cannot read next byte!`;
+                return this.data[this.#idx++];
+            }
+            
+            hasNext () { return this.#idx < this.data.length; }
+            
+            char () { return String.fromCharCode(this.#byte()); }
+            
+            int (bits = 32) {
+                let val = 0;
+                for (let i = 0; i < bits / 8; ++i) {
+                    val |= this.#byte() << (8 * i);
+                }
+                return val;
+            }
+            
+            float () {
+                for (let i = 0; i < 4; ++i) {
+                    this.#floatView.setUint8(3 - i, this.#byte());
+                }
+                return this.#floatView.getFloat32();
+            }
+            
+            vec(dim = 3) {
+                const result = [];
+                for (let i = 0; i < dim; ++i) {
+                    result.push(this.float());
+                }
+                return result;
+            }
+            
+            string () {
+                let str = '';
+                while (true) {
+                    const c = this.char();
+                    if (c == '\0') return str;
+                    str += c;
+                }
+            }
+        };
+        
+        (async () => {
+            
+            // Load file contents
+            const button = document.createElement('button');
+            button.textContent = 'Import binary file';
+            document.body.append(button);
+            await new Promise(resolve => button.onclick = resolve);
+            button.remove();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.click();
+            await new Promise(resolve => input.addEventListener('change', resolve));
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(input.files[0]);
+            await new Promise(resolve => reader.onload = resolve);
+            const data = new Uint8Array(reader.result);
+            
+            // Create rendering context
+            const size = Math.min(window.innerHeight, window.innerWidth);
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = size;
+            canvas.style.width = canvas.style.height = `${size}px`;
+            const ctx = canvas.getContext('2d');
+            document.body.append(canvas);
+            ctx.fillStyle = 'white';
+            
+            // Read data
+            const importer = new BinaryImporter(data);
+            while (importer.hasNext()) {
+                
+                // header
+                if (importer.char() !== 'A' || importer.char() !== 'M' || importer.char() !== 'M') {
+                    throw `Invalid binary file, the AMM header is not respected!`;
+                }
+                
+                // metadata
+                const modelName = importer.string();
+                const particleCount = importer.int();
+                const dimension = importer.int();
+                
+                // clear canvas
+                ctx.clearRect(0, 0, size, size);
+                
+                // individual particles
+                for (let i = 0; i < particleCount; ++i) {
+                    const pos = importer.vec(dimension);
+                    const dir = importer.vec(dimension);
+                    
+                    // normalized screen position
+                    const u = pos[0] / SCALE + 0.5;
+                    const v = pos[1] / SCALE + 0.5;
+                    
+                    // draw particle (2D only, no 3D support for now)
+                    ctx.beginPath();
+                    ctx.ellipse(u * size, v * size, 0.0025*size, 0.0025*size, 0, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+                
+                // sanity check: footer
+                if (importer.int(8) != 0) {
+                    throw `Invalid binary file, the \\0 footer is not respected!`;
+                }
+                
+                // wait a little before the next frame
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+        })();
+        
+    </script>
+</body>
+</html>

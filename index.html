@@ -33,7 +33,7 @@
     <script>
         
         // how many units across to consider the canvas
-        const SCALE = 500;
+        const SCALE = 1000;
         
         // Helper class to load binary data
         class BinaryImporter {
@@ -148,7 +148,7 @@
                 }
                 
                 // wait a little before the next frame
-                await new Promise(resolve => setTimeout(resolve, 50));
+                await new Promise(resolve => requestAnimationFrame(resolve));
             }
             
         })();

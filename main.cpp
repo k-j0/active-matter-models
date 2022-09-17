@@ -31,10 +31,10 @@ int main (int argc, char** argv) {
     std::vector<std::uint8_t> binaryData;
     for (std::size_t i = 0; i < iterations; ++i) {
         model->update();
+        model->toBinary(binaryData);
         if (i % progressCheck == 0) {
             std::printf("%ld %%...\r", i * 100 / iterations);
             std::fflush(stdout);
-            model->toBinary(binaryData);
         }
     }
     std::printf("100 %%.  \n\n");

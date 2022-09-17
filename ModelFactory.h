@@ -25,11 +25,11 @@ public:
         }
         
         if (name.compare("active-brownian") == 0) {
-            return new ActiveBrownianMotion<D>(particleCount, args.read<float>("angular-diffusion", 0.05f), seed);
+            return new ActiveBrownianMotion<D>(particleCount, args.read<float>("angular-diffusion", 0.02f), seed);
         }
         
         if (name.compare("vicsek") == 0) {
-            return new Vicsek<D>(particleCount, args.read<float>("detection-radius", 5.0f), args.read<float>("angular-diffusion", 0.05f), seed);
+            return new Vicsek<D>(particleCount, args.read<float>("detection-radius", 5.0f), args.read<float>("angular-diffusion", 0.02f), seed);
         }
         
         std::printf("Invalid model name %s!\n", name.c_str());

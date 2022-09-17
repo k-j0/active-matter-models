@@ -2,6 +2,7 @@
 
 #include "Model.h"
 #include "Vec.h"
+#include "VecUtils.h"
 #include <vector>
 
 template<int D>
@@ -17,7 +18,6 @@ class ActiveBrownianMotion : public Model {
     
 private:
     Vec<D-1> randomAngle ();
-    Vec<D> toCartesian (const Vec<D-1>& angle);
     
 public:
     ActiveBrownianMotion (std::size_t particleCount, float angularDiffusion, unsigned int seed);
@@ -47,31 +47,12 @@ template<>
 Vec<1> ActiveBrownianMotion<2>::randomAngle () {
     return { rand01() * PI * 2.0f };
 }
-template<>
-Vec<2> ActiveBrownianMotion<2>::toCartesian (const Vec<1>& angle) {
-    return {
-        std::cos(angle.X()),
-        std::sin(angle.X())
-    };
-}
 
 template<>
 Vec<2> ActiveBrownianMotion<3>::randomAngle () {
     return {
         rand01() * PI * 2.0f,
         rand01() * PI
-    };
-}
-template<>
-Vec<3> ActiveBrownianMotion<3>::toCartesian (const Vec<2>& angle) {
-    // spherical coordinates (r = 1) to cartesian coordinates
-    float theta = angle.X(); // 0..2pi
-    float phi = angle.Y(); // 0..pi
-    float sinPhi = std::sin(phi);
-    return {
-        std::cos(theta) * sinPhi,
-        std::sin(theta) * sinPhi,
-        std::cos(phi)
     };
 }
 
@@ -89,7 +70,7 @@ void ActiveBrownianMotion<D>::update () {
         }
         
         // keep running
-        Vec<D> direction = toCartesian(particles[i].angle);
+        Vec<D> direction = VecUtils::toCartesian<D>(particles[i].angle);
         particles[i].pos += direction;
         
     }

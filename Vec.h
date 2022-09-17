@@ -130,11 +130,13 @@ public:
 		for (int i = 0; i < N; ++i) ret.set(i, length > (T) 0 ? get(i) / length : (T)0);
 		return ret;
 	}
-	inline void normalize() {
+	inline bool normalize() {
 		T length = (T)sqrt((T)lengthSqr());
 		if (length > (T)0) {
 			for (int i = 0; i < N; ++i) set(i, get(i) / length);
+            return true;
 		}
+        return false;
 	}
 
 
@@ -148,18 +150,12 @@ public:
 		return ret;
 	}
 
-	inline Vec<N, T> operator+=(const Vec<N, T>& v) {
-		Vec<N, T> n = (*this) + v;
-		for (int i = 0; i < N; ++i) set(i, n[i]);
-		return *this;
-	}
-
-	inline void add(const T& f) {
-		for (int i = 0; i < N; ++i) set(i, get(i) + f);
-	}
-
-	inline void add(const Vec<N, T>& v) {
+	inline void operator+=(const Vec<N, T>& v) {
 		for (int i = 0; i < N; ++i) set(i, get(i) + v[i]);
+	}
+
+	inline void operator+=(const T& f) {
+		for (int i = 0; i < N; ++i) set(i, get(i) + f);
 	}
 
 	inline Vec<N, T> operator-(const Vec<N, T>& v) const {
@@ -180,8 +176,8 @@ public:
 		for (int i = 0; i < N; ++i) ret.set(i, get(i) * f);
 		return ret;
 	}
-
-	inline void multiply(const T& f) {
+    
+    inline void operator*=(const T& f) {
 		for (int i = 0; i < N; ++i) set(i, get(i) * f);
 	}
 

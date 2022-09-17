@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "RunAndTumble.h"
 #include "ActiveBrownianMotion.h"
+#include "Vicsek.h"
 
 class ModelFactory {
     ModelFactory()=delete;
@@ -25,6 +26,10 @@ public:
         
         if (name.compare("active-brownian") == 0) {
             return new ActiveBrownianMotion<D>(particleCount, args.read<float>("angular-diffusion", 0.1f), seed);
+        }
+        
+        if (name.compare("vicsek") == 0) {
+            return new Vicsek<D>(particleCount, args.read<float>("detection-radius", 5.0f), args.read<float>("angular-diffusion", 0.1f), seed);
         }
         
         std::printf("Invalid model name %s!\n", name.c_str());

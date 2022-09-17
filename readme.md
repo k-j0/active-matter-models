@@ -24,3 +24,4 @@ $ ./amm help -model <model-name>
 
 - Continuous run & tumble (`-model run-and-tumble`)
 - Active Brownian motion (`-model active-brownian`)
+- Vicsek model (`-model vicsek`)

@@ -11,7 +11,7 @@ protected:
     std::string getName () override { return "Run & Tumble"; }
     
 public:
-    RunAndTumble (std::size_t particleCount, float flipProbability, unsigned int seed);
+    RunAndTumble (std::size_t particleCount, float periodicity, float flipProbability, unsigned int seed);
     void update () override;
     
 };
@@ -19,8 +19,8 @@ public:
 
 
 template<int D>
-RunAndTumble<D>::RunAndTumble (std::size_t particleCount, float flipProbability, unsigned int seed) :
-    Model<D>(particleCount, seed), flipProbability(flipProbability) { }
+RunAndTumble<D>::RunAndTumble (std::size_t particleCount, float periodicity, float flipProbability, unsigned int seed) :
+    Model<D>(particleCount, periodicity, seed), flipProbability(flipProbability) { }
 
 template<int D>
 void RunAndTumble<D>::update () {
@@ -39,5 +39,9 @@ void RunAndTumble<D>::update () {
         Vec<D> direction = VecUtils::toCartesian<D>(this->particles[i].rotation);
         this->particles[i].pos += direction;
         
+        // ensure periodic domain
+        if (this->periodicity > 0) {
+            this->particles[i].pos.periodic(this->periodicity);
+        }
     }
 }

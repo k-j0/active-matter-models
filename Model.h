@@ -50,6 +50,7 @@ class Model : public ModelBase {
 protected:
     std::size_t particleCount;
     std::vector<Particle<D>> particles;
+    float periodicity; // negative to disable periodic domain
     
     Vec<D-1> randomRotation ();
     
@@ -57,7 +58,7 @@ protected:
     
 public:
     
-    Model (std::size_t particleCount, unsigned int seed) : ModelBase(seed), particleCount(particleCount) {
+    Model (std::size_t particleCount, float periodicity, unsigned int seed) : ModelBase(seed), particleCount(particleCount), periodicity(periodicity) {
         particles.reserve(particleCount);
         for (std::size_t i = 0; i < particleCount; ++i) {
             particles.push_back({
@@ -120,8 +121,7 @@ void Model<D>::toBinary (std::vector<std::uint8_t>& data) {
     data.push_back('M');
     data.push_back('M');
     
-    // Write the name of the model used, the number of particles and the dimension
-    BinIO::writeString(data, getName());
+    // Write the number of particles and the dimension
     BinIO::writeSimple<std::int32_t>(data, particleCount);
     BinIO::writeSimple<std::int32_t>(data, D);
     

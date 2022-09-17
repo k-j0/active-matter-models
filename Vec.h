@@ -234,6 +234,15 @@ public:
 			else if (get(i) > b) set(i, b);
 		}
 	}
+    
+    
+    /// Component-wise periodicity (centered at 0, size 2*length)
+    inline void periodic (const T& length) {
+        for (int i = 0; i < N; ++i) {
+            while (get(i) >= length) { set(i, get(i) - 2*length); }
+            while (get(i) < -length) { set(i, get(i) + 2*length); }
+        }
+    }
 
 
 	/// Assuming two Vecs representing positions in space, moves this vec towards the position of the other one, with a clamp on how far the vec may move at once

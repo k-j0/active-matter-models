@@ -36,11 +36,25 @@ void RunAndTumble::update () {
     }
 }
 
-void RunAndTumble::print () {
+float RunAndTumble::getMSD () {
+    float sum = 0.0f;
     std::size_t sz = particles.size();
-    std::printf("Run and tumble, %ld particles:\n", sz);
+    
+    #pragma omp parallel for reduction(+: sum)
     for (std::size_t i = 0; i < sz; ++i) {
+        sum += particles[i].pos.lengthSqr();
+    }
+    
+    return sum / sz;
+}
+
+void RunAndTumble::print () {
+    std::size_t size = particles.size();
+    std::printf("Run and tumble, %ld particles:\n", size);
+    for (std::size_t i = 0, sz = size > 10 ? 10 : size; i < sz; ++i) {
         std::printf("\t- (%ld) %s, %s\n", i, particles[i].pos.toString().c_str(), particles[i].dir.toString().c_str());
     }
+    if (size > 10) std::printf("\t- ... (only first 10 shown)\n");
+    std::printf("MSD: %f\n", getMSD());
     std::printf("\n");
 }

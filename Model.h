@@ -21,6 +21,7 @@ public:
     
     virtual ~Model () { }
     virtual void update() = 0;
+    virtual float getMSD() = 0;
     virtual void print() = 0;
     
 };

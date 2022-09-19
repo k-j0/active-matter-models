@@ -26,10 +26,10 @@ private:
     
 protected:
     std::string getName () override { return "Boids"; }
+    void updateParticle (std::size_t i) override;
     
 public:
     Boids (Params params, typename Model<D>::Params modelParams);
-    void update () override;
     
 };
 
@@ -42,77 +42,60 @@ Boids<D>::Boids (Boids<D>::Params params, typename Model<D>::Params modelParams)
         sqrt2Dr(std::sqrt(2.0f * params.angularDiffusion)) { }
 
 template<int D>
-void Boids<D>::update () {
+void Boids<D>::updateParticle (std::size_t i) {
     
-    // each step, read from front while writing to back, then swap so the latest state is always in the front buffer
-    
-    std::size_t sz = this->particlesFront->size();
-    
-    #pragma omp parallel for
-    for (std::size_t i = 0; i < sz; ++i) {
+    // separation, alignment and cohesion steps
+    Vec<D> pos = (*this->particlesFront)[i].pos;
+    Vec<D> dir = VecUtils::toCartesian<D>((*this->particlesFront)[i].rotation);
+    Vec<D> separation = Vec<D>::Zero();
+    Vec<D> alignment = dir;
+    Vec<D> cohesion = Vec<D>::Zero();
+    std::size_t neighbourCount = 0;
+    for (std::size_t j = 0; j < this->particleCount; ++j) {
+        if (i == j) continue;
+        const Vec<D>& otherPos = (*this->particlesFront)[j].pos;
+        float distanceSqr = (pos - otherPos).lengthSqr();
         
-        // separation, alignment and cohesion steps
-        Vec<D> pos = (*this->particlesFront)[i].pos;
-        Vec<D> dir = VecUtils::toCartesian<D>((*this->particlesFront)[i].rotation);
-        Vec<D> separation = Vec<D>::Zero();
-        Vec<D> alignment = dir;
-        Vec<D> cohesion = Vec<D>::Zero();
-        std::size_t neighbourCount = 0;
-        for (std::size_t j = 0; j < sz; ++j) {
-            if (i == j) continue;
-            const Vec<D>& otherPos = (*this->particlesFront)[j].pos;
-            float distanceSqr = (pos - otherPos).lengthSqr();
-            
-            // separation step
-            if (distanceSqr <= params.separationRadius * params.separationRadius) {
-                Vec<D> delta = pos - otherPos;
-                delta.normalize();
-                delta *= std::sqrt(distanceSqr);
-                separation += delta;
-            }
-            
-            // alignment & cohesion steps
-            if (distanceSqr <= params.detectionRadius * params.detectionRadius) {
-                alignment += VecUtils::toCartesian<D>((*this->particlesFront)[j].rotation);
-                cohesion += otherPos;
-                ++neighbourCount;
-            }
+        // separation step
+        if (distanceSqr <= params.separationRadius * params.separationRadius) {
+            Vec<D> delta = pos - otherPos;
+            delta.normalize();
+            delta *= std::sqrt(distanceSqr);
+            separation += delta;
         }
         
-        // Normalize the direction vectors
-        if (!separation.isZero()) {
-            separation.normalize();
+        // alignment & cohesion steps
+        if (distanceSqr <= params.detectionRadius * params.detectionRadius) {
+            alignment += VecUtils::toCartesian<D>((*this->particlesFront)[j].rotation);
+            cohesion += otherPos;
+            ++neighbourCount;
         }
-        if (!alignment.isZero()) {
-            alignment.normalize();
-        }
-        if (!cohesion.isZero()) {
-            cohesion *= 1.0f / neighbourCount;
-            cohesion = cohesion - pos;
-            cohesion.normalize();
-        }
-        
-        Vec<D> targetDirection = separation * params.separationCoeff + alignment * params.alignmentCoeff + cohesion * params.cohesionCoeff;
-        Vec<D> direction = Vec<D>::Lerp(dir, targetDirection, params.adoptionRate);
-        Vec<D-1> rotation = VecUtils::toSpherical<D>(direction);
-        
-        // apply white noise to rotation
-        for (int d = 0; d < D-1; ++d) {
-            rotation.set(d, rotation.get(d) + sqrt2Dr*this->rand(std::normal_distribution<float>(0.0f, 1.0f)));
-        }
-        direction = VecUtils::toCartesian<D>(rotation);
-        
-        // update back buffer
-        (*this->particlesBack)[i].rotation = rotation;
-        (*this->particlesBack)[i].pos = pos + direction;
-        
-        // ensure periodic domain
-        if (this->periodicity > 0) {
-            (*this->particlesBack)[i].pos.periodic(this->periodicity);
-        }
-        
     }
     
-    // bring back buffer to front for next timestep
-    this->swapBuffers();
+    // Normalize the direction vectors
+    if (!separation.isZero()) {
+        separation.normalize();
+    }
+    if (!alignment.isZero()) {
+        alignment.normalize();
+    }
+    if (!cohesion.isZero()) {
+        cohesion *= 1.0f / neighbourCount;
+        cohesion = cohesion - pos;
+        cohesion.normalize();
+    }
+    
+    Vec<D> targetDirection = separation * params.separationCoeff + alignment * params.alignmentCoeff + cohesion * params.cohesionCoeff;
+    Vec<D> direction = Vec<D>::Lerp(dir, targetDirection, params.adoptionRate);
+    Vec<D-1> rotation = VecUtils::toSpherical<D>(direction);
+    
+    // apply white noise to rotation
+    for (int d = 0; d < D-1; ++d) {
+        rotation.set(d, rotation.get(d) + sqrt2Dr*this->rand(std::normal_distribution<float>(0.0f, 1.0f)));
+    }
+    direction = VecUtils::toCartesian<D>(rotation);
+    
+    // update back buffer
+    (*this->particlesBack)[i].rotation = rotation;
+    (*this->particlesBack)[i].pos = pos + direction;
 }

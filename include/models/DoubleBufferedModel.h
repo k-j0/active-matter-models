@@ -11,6 +11,8 @@ protected:
     std::vector<Particle<D>> heldParticles;
     std::vector<Particle<D>>* particlesFront, * particlesBack;
     
+private:
+    
     void swapBuffers () {
         auto* oldBack = particlesBack;
         particlesBack = particlesFront;
@@ -27,6 +29,7 @@ public:
     
     virtual float getMSD () override;
     virtual void print () override;
+    virtual void update () override;
     
 };
 
@@ -41,6 +44,24 @@ float DoubleBufferedModel<D>::getMSD () {
     }
     
     return sum / this->particleCount;
+}
+
+template<int D>
+void DoubleBufferedModel<D>::update () {
+    #pragma omp parallel for
+    for (std::size_t i = 0; i < this->particleCount; ++i) {
+        
+        // update single particle
+        this->updateParticle(i);
+        
+        // ensure periodic domain
+        if (this->periodicity > 0) {
+            (*particlesBack)[i].pos.periodic(this->periodicity);
+        }
+    }
+    
+    // bring back buffer to front for next timestep
+    swapBuffers();
 }
 
 template<int D>

@@ -65,6 +65,7 @@ protected:
     Vec<D-1> randomRotation ();
     
     virtual std::string getName () = 0;
+    virtual void updateParticle (std::size_t i) = 0;
     
 public:
     
@@ -82,6 +83,7 @@ public:
     
     virtual float getMSD () override;
     virtual void print () override;
+    virtual void update () override;
     void toBinary (std::vector<std::uint8_t>& data) override;
     
 };
@@ -138,6 +140,21 @@ void Model<D>::print () {
     if (particleCount > 10) std::printf("\t- ... (only first 10 shown)\n");
     std::printf("MSD: %f\n", getMSD());
     std::printf("\n");
+}
+
+template<int D>
+void Model<D>::update () {
+    #pragma omp parallel for
+    for (std::size_t i = 0; i < particleCount; ++i) {
+        
+        // update single particle
+        updateParticle(i);
+        
+        // ensure periodic domain
+        if (periodicity > 0) {
+            particles[i].pos.periodic(periodicity);
+        }
+    }
 }
 
 template<int D>

@@ -21,7 +21,7 @@ public:
         std::string name = args.read<std::string>("model");
         std::size_t particleCount = args.read<int>("particles", 512);
         int periodicity = args.read<int>("periodic-size", 500); // -1 for non-periodic domain
-        bool startUniformly = args.read<bool>("uniform-start", true);
+        bool startUniformly = !args.read<bool>("non-uniform-start", false);
         unsigned int seed = args.read<int>("seed", 0);
         
         if (name.compare("random-walk") == 0) {

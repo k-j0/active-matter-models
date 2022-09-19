@@ -108,7 +108,7 @@
             canvas.style.width = canvas.style.height = `${size}px`;
             const ctx = canvas.getContext('2d');
             document.body.append(canvas);
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
             
             // Read data
             const importer = new BinaryImporter(data);

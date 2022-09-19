@@ -3,6 +3,7 @@
 #include <string>
 #include "Arguments.h"
 #include "models/Model.h"
+#include "models/RandomWalk.h"
 #include "models/RunAndTumble.h"
 #include "models/ActiveBrownianMotion.h"
 #include "models/Vicsek.h"
@@ -22,6 +23,10 @@ public:
         int periodicity = args.read<int>("periodic-size", 500); // -1 for non-periodic domain
         bool startUniformly = args.read<bool>("uniform-start", true);
         unsigned int seed = args.read<int>("seed", 0);
+        
+        if (name.compare("random-walk") == 0) {
+            return new RandomWalk<D>(particleCount, periodicity, startUniformly, seed);
+        }
         
         if (name.compare("run-and-tumble") == 0) {
             return new RunAndTumble<D>(particleCount, periodicity, startUniformly, args.read<float>("flip-prob", 0.1f), seed);

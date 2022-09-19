@@ -28,6 +28,7 @@ For further information on what the binary file contains, please see the `Model:
 
 ## List of models
 
+- Random walk (`-model random-walk`) (note: this is a passive model)
 - Continuous run & tumble (`-model run-and-tumble`)
 - Active Brownian motion (`-model active-brownian`)
 - Vicsek model (`-model vicsek`)

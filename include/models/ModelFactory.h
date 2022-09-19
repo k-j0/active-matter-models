@@ -6,6 +6,7 @@
 #include "models/RunAndTumble.h"
 #include "models/ActiveBrownianMotion.h"
 #include "models/Vicsek.h"
+#include "models/Boids.h"
 
 class ModelFactory {
     ModelFactory()=delete;
@@ -32,6 +33,18 @@ public:
         
         if (name.compare("vicsek") == 0) {
             return new Vicsek<D>(particleCount, periodicity, startUniformly, args.read<float>("detection-radius", 25.0f), args.read<float>("angular-diffusion", 0.02f), seed);
+        }
+        
+        if (name.compare("boids") == 0) {
+            typename Boids<D>::Params params;
+            params.detectionRadius = args.read<float>("detection-radius", 25.0f);
+            params.separationRadius = args.read<float>("separation-radius", 5.0f);
+            params.angularDiffusion = args.read<float>("angular-diffusion", 0.02f);
+            params.separationCoeff = args.read<float>("separation", 1.0f);
+            params.alignmentCoeff = args.read<float>("alignment", 0.2f);
+            params.cohesionCoeff = args.read<float>("cohesion", 0.2f);
+            params.adoptionRate = args.read<float>("rate", 0.25f);
+            return new Boids<D>(particleCount, periodicity, startUniformly, params, seed);
         }
         
         std::printf("Invalid model name %s!\n", name.c_str());

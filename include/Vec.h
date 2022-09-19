@@ -287,6 +287,11 @@ public:
 		for (int i = 0; i < N; ++i) if (std::isnan(get(i))) return true;
 		return false;
 	}
+	
+	bool isZero() const {
+		for (int i = 0; i < N; ++i) if (get(i) != (T)0) return false;
+		return true;
+	}
 
 
 	// String conversion

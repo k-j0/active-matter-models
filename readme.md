@@ -31,3 +31,4 @@ For further information on what the binary file contains, please see the `Model:
 - Continuous run & tumble (`-model run-and-tumble`)
 - Active Brownian motion (`-model active-brownian`)
 - Vicsek model (`-model vicsek`)
+- Boids (`-model boids`)

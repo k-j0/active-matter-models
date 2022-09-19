@@ -9,6 +9,7 @@ int main (int argc, char** argv) {
     ModelBase* model = nullptr;
     std::size_t iterations;
     std::string outputFile;
+    unsigned int saveFrames;
     {
         Arguments args(argc, argv);
         unsigned int d = args.read<int>("dim", 2);
@@ -21,6 +22,7 @@ int main (int argc, char** argv) {
         }
         iterations = args.read<int>("iter", 1000);
         outputFile = args.read<std::string>("out", "results/out.bin");
+        saveFrames = args.read<int>("save-frames", 10); // 1 = save every single frame, 5 = save every 5 frames, etc.
     }
     
     std::printf("Starting...\n\n");
@@ -31,7 +33,9 @@ int main (int argc, char** argv) {
     std::vector<std::uint8_t> binaryData;
     for (std::size_t i = 0; i < iterations; ++i) {
         model->update();
-        model->toBinary(binaryData);
+        if (i % saveFrames == 0) {
+            model->toBinary(binaryData);
+        }
         if (i % progressCheck == 0) {
             std::printf("%ld %%...\r", i * 100 / iterations);
             std::fflush(stdout);

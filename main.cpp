@@ -1,7 +1,7 @@
 
 #include <fstream>
 #include "Arguments.h"
-#include "ModelFactory.h"
+#include "models/ModelFactory.h"
 
 int main (int argc, char** argv) {
     

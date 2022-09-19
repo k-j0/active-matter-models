@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Model.h"
+#include "models/Model.h"
 
 template<int D>
 class ActiveBrownianMotion : public Model<D> {

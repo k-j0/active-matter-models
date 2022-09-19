@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DoubleBufferedModel.h"
+#include "models/DoubleBufferedModel.h"
 
 template<int D>
 class Vicsek : public DoubleBufferedModel<D> {

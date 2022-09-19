@@ -2,10 +2,10 @@
 
 #include <string>
 #include "Arguments.h"
-#include "Model.h"
-#include "RunAndTumble.h"
-#include "ActiveBrownianMotion.h"
-#include "Vicsek.h"
+#include "models/Model.h"
+#include "models/RunAndTumble.h"
+#include "models/ActiveBrownianMotion.h"
+#include "models/Vicsek.h"
 
 class ModelFactory {
     ModelFactory()=delete;

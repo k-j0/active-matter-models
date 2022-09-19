@@ -21,7 +21,8 @@ public:
         std::string name = args.read<std::string>("model");
         typename Model<D>::Params params;
         params.particleCount = args.read<int>("particles", 512);
-        params.periodicity = args.read<int>("periodic-size", 500); // -1 for non-periodic domain
+        params.periodicity = args.read<int>("periodic-size", 500); // 0 for non-periodic domain
+        params.boundary = args.read<int>("boundary-radius", 0); // 0 to remove boundary
         params.startUniformly = !args.read<bool>("non-uniform-start", false);
         params.seed = args.read<int>("seed", 0);
         

@@ -234,6 +234,15 @@ public:
 			else if (get(i) > b) set(i, b);
 		}
 	}
+	
+	inline bool clampLength(const T& maxLen) {
+		if (!isZero() && lengthSqr() > maxLen * maxLen) {
+			normalize();
+			operator*=(maxLen);
+			return true;
+		}
+		return false;
+	}
     
     
     /// Component-wise periodicity (centered at 0, size 2*length)

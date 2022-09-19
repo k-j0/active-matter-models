@@ -54,10 +54,7 @@ void DoubleBufferedModel<D>::update () {
         // update single particle
         this->updateParticle(i);
         
-        // ensure periodic domain
-        if (this->periodicity > 0) {
-            (*particlesBack)[i].pos.periodic(this->periodicity);
-        }
+        this->postProcess(&(*particlesBack)[i]);
     }
     
     // bring back buffer to front for next timestep

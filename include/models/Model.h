@@ -52,6 +52,7 @@ public:
     struct Params {
         std::size_t particleCount = 1024;
         float periodicity = 500;
+        float boundary = 0;
         bool startUniformly = true;
         unsigned int seed = 0;
     };
@@ -60,20 +61,22 @@ protected:
     std::size_t particleCount;
     std::vector<Particle<D>> particles;
     float periodicity; // negative to disable periodic domain
+    float boundary;
     
     Vec<D> randomLocation (float size);
     Vec<D-1> randomRotation ();
     
     virtual std::string getName () = 0;
     virtual void updateParticle (std::size_t i) = 0;
+    void postProcess(Particle<D>* particle);
     
 public:
     
-    Model (Params params) : ModelBase(params.seed), particleCount(params.particleCount), periodicity(params.periodicity) {
+    Model (Params params) : ModelBase(params.seed), particleCount(params.particleCount), periodicity(params.periodicity), boundary(params.boundary) {
         particles.reserve(particleCount);
         for (std::size_t i = 0; i < particleCount; ++i) {
             particles.push_back({
-                params.startUniformly ? randomLocation(periodicity < 0 ? 500.0f : periodicity) : Vec<D>::Zero(),
+                params.startUniformly ? randomLocation(boundary > 0 ? boundary : periodicity > 0 ? periodicity : 500) : Vec<D>::Zero(),
                 randomRotation()
             });
         }
@@ -143,6 +146,22 @@ void Model<D>::print () {
 }
 
 template<int D>
+void Model<D>::postProcess (Particle<D>* particle) {
+    // ensure periodic domain
+    if (periodicity > 0) {
+        particle->pos.periodic(periodicity);
+    }
+    
+    // apply boundary condition
+    if (boundary > 0) {
+        if (particle->pos.clampLength(boundary)) {
+            // when hitting the boundary, bounce off
+            particle->rotation = VecUtils::toSpherical<D>(particle->pos.normalized() * -1);
+        }
+    }
+}
+
+template<int D>
 void Model<D>::update () {
     #pragma omp parallel for
     for (std::size_t i = 0; i < particleCount; ++i) {
@@ -150,10 +169,7 @@ void Model<D>::update () {
         // update single particle
         updateParticle(i);
         
-        // ensure periodic domain
-        if (periodicity > 0) {
-            particles[i].pos.periodic(periodicity);
-        }
+        postProcess(&particles[i]);
     }
 }
 

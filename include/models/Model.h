@@ -41,6 +41,7 @@ template<int D>
 struct Particle {
     Vec<D> pos;
     Vec<D-1> rotation; // in 2D, theta; in 3D theta (lat) and phi (long)
+    bool frozen = false; // frozen particles are not updated
 };
 
 // Templated base class from which the common models can derive, containing the particle data
@@ -157,6 +158,11 @@ void Model<D>::postProcess (Particle<D>* particle) {
         if (particle->pos.clampLength(boundary)) {
             // when hitting the boundary, bounce off
             particle->rotation = VecUtils::toSpherical<D>(particle->pos.normalized() * -1);
+            
+            // particles that hit the boundary in the right spot (down the X axis) are considered to have "escaped"
+            if (particle->pos.X() >= boundary * 0.999) {
+                particle->frozen = true;
+            }
         }
     }
 }
@@ -165,6 +171,7 @@ template<int D>
 void Model<D>::update () {
     #pragma omp parallel for
     for (std::size_t i = 0; i < particleCount; ++i) {
+        if (particles[i].frozen) continue;
         
         // update single particle
         updateParticle(i);

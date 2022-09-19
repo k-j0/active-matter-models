@@ -50,6 +50,10 @@ template<int D>
 void DoubleBufferedModel<D>::update () {
     #pragma omp parallel for
     for (std::size_t i = 0; i < this->particleCount; ++i) {
+        if ((*particlesFront)[i].frozen) {
+            (*particlesBack)[i].frozen = true;
+            continue;
+        }
         
         // update single particle
         this->updateParticle(i);

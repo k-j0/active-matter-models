@@ -9,16 +9,13 @@ protected:
     std::string getName () override { return "Random Walk"; }
     
 public:
-    RandomWalk (std::size_t particleCount, float periodicity, bool startUniformly, unsigned int seed);
+    RandomWalk (typename Model<D>::Params params) : Model<D>(params) { }
     void update () override;
     
 };
 
 
 
-template<int D>
-RandomWalk<D>::RandomWalk (std::size_t particleCount, float periodicity, bool startUniformly, unsigned int seed) :
-    Model<D>(particleCount, periodicity, startUniformly, seed) { }
 
 template<int D>
 void RandomWalk<D>::update () {

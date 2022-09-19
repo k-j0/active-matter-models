@@ -47,6 +47,15 @@ struct Particle {
 template<int D>
 class Model : public ModelBase {
     
+public:
+
+    struct Params {
+        std::size_t particleCount = 1024;
+        float periodicity = 500;
+        bool startUniformly = true;
+        unsigned int seed = 0;
+    };
+    
 protected:
     std::size_t particleCount;
     std::vector<Particle<D>> particles;
@@ -59,11 +68,11 @@ protected:
     
 public:
     
-    Model (std::size_t particleCount, float periodicity, bool startUniformly, unsigned int seed) : ModelBase(seed), particleCount(particleCount), periodicity(periodicity) {
+    Model (Params params) : ModelBase(params.seed), particleCount(params.particleCount), periodicity(params.periodicity) {
         particles.reserve(particleCount);
         for (std::size_t i = 0; i < particleCount; ++i) {
             particles.push_back({
-                startUniformly ? randomLocation(periodicity < 0 ? 500.0f : periodicity) : Vec<D>::Zero(),
+                params.startUniformly ? randomLocation(periodicity < 0 ? 500.0f : periodicity) : Vec<D>::Zero(),
                 randomRotation()
             });
         }

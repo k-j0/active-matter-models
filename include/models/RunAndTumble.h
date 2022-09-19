@@ -11,7 +11,7 @@ protected:
     std::string getName () override { return "Run & Tumble"; }
     
 public:
-    RunAndTumble (std::size_t particleCount, float periodicity, bool startUniformly, float flipProbability, unsigned int seed);
+    RunAndTumble (float flipProbability, typename Model<D>::Params params);
     void update () override;
     
 };
@@ -19,8 +19,8 @@ public:
 
 
 template<int D>
-RunAndTumble<D>::RunAndTumble (std::size_t particleCount, float periodicity, bool startUniformly, float flipProbability, unsigned int seed) :
-    Model<D>(particleCount, periodicity, startUniformly, seed), flipProbability(flipProbability) { }
+RunAndTumble<D>::RunAndTumble (float flipProbability, typename Model<D>::Params params) :
+    Model<D>(params), flipProbability(flipProbability) { }
 
 template<int D>
 void RunAndTumble<D>::update () {

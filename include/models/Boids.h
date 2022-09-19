@@ -28,7 +28,7 @@ protected:
     std::string getName () override { return "Boids"; }
     
 public:
-    Boids (std::size_t particleCount, float periodicity, bool startUniformly, Params params, unsigned int seed);
+    Boids (Params params, typename Model<D>::Params modelParams);
     void update () override;
     
 };
@@ -36,8 +36,8 @@ public:
 
 
 template<int D>
-Boids<D>::Boids (std::size_t particleCount, float periodicity, bool startUniformly, Boids<D>::Params params, unsigned int seed) :
-        DoubleBufferedModel<D>(particleCount, periodicity, startUniformly, seed),
+Boids<D>::Boids (Boids<D>::Params params, typename Model<D>::Params modelParams) :
+        DoubleBufferedModel<D>(modelParams),
         params(params),
         sqrt2Dr(std::sqrt(2.0f * params.angularDiffusion)) { }
 

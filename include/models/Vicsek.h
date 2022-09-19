@@ -12,7 +12,7 @@ protected:
     std::string getName () override { return "Vicsek model"; }
     
 public:
-    Vicsek (std::size_t particleCount, float periodicity, bool startUniformly, float detectionRadius, float angularDiffusion, unsigned int seed);
+    Vicsek (float detectionRadius, float angularDiffusion, typename Model<D>::Params params);
     void update () override;
     
 };
@@ -20,8 +20,8 @@ public:
 
 
 template<int D>
-Vicsek<D>::Vicsek (std::size_t particleCount, float periodicity, bool startUniformly, float detectionRadius, float angularDiffusion, unsigned int seed) :
-    DoubleBufferedModel<D>(particleCount, periodicity, startUniformly, seed), r2(detectionRadius*detectionRadius), sqrt2Dr(std::sqrt(2.0f * angularDiffusion)) { }
+Vicsek<D>::Vicsek (float detectionRadius, float angularDiffusion, typename Model<D>::Params params) :
+    DoubleBufferedModel<D>(params), r2(detectionRadius*detectionRadius), sqrt2Dr(std::sqrt(2.0f * angularDiffusion)) { }
 
 template<int D>
 void Vicsek<D>::update () {

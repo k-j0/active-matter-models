@@ -5,7 +5,7 @@ This repository contains parallel C++ implementations of a handful of selected m
 
 ## Building & running
 
-Run the following, with a version of GCC compatible with C++17, where `<model-name>` is the name of the model to run.
+Run the following, with a version of GCC compatible with C++17, where `<model-name>` is the name of the model to run. The code has been tested on Ubuntu and Windows (through Cygwin64).
 ```sh
 $ make
 $ ./amm -model <model-name>
